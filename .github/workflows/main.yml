@@ -33,11 +33,12 @@ jobs:
           echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH" >> $GITHUB_ENV
       - name: Accept Android licenses
         run: |
-          yes | sdkmanager --licenses
-          yes | sdkmanager --update
+          mkdir -p /usr/local/android-sdk/licenses
+          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > /usr/local/android-sdk/licenses/android-sdk-license
+          echo "84831b9409646a918e30573bab4c9c91346d8abd" > /usr/local/android-sdk/licenses/android-sdk-preview-license
       - name: Install required Android SDK packages
         run: |
-          sdkmanager "platforms;android-30" "build-tools;30.0.3" "platform-tools"
+          yes | sdkmanager --install "platforms;android-30" "build-tools;30.0.3" "platform-tools" --sdk_root=${ANDROID_HOME}
       - name: Install dependencies
         run: |
           pip install --upgrade pip
@@ -61,9 +62,10 @@ jobs:
         run: |
           sed -i 's/^android.sdk_path =.*/android.sdk_path = \/usr\/local\/android-sdk/' buildozer.spec
           sed -i 's/^android.accept_sdk_license =.*/android.accept_sdk_license = True/' buildozer.spec
+          sed -i 's/^android.build_tools =.*/android.build_tools = 30.0.3/' buildozer.spec
       - name: Build APK
         run: |
-          buildozer android debug
+          yes | buildozer android debug
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:

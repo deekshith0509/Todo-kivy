@@ -44,6 +44,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install cython buildozer
+          buildozer android clean
       - name: Install additional build dependencies
         run: |
           sudo apt-get install -y \
@@ -67,7 +68,7 @@ jobs:
           sed -i 's/^log_level =.*/log_level = 2/' buildozer.spec
       - name: Build APK
         run: |
-          buildozer android clean
+          
           yes | buildozer android debug
       - name: Upload APK
         uses: actions/upload-artifact@v3

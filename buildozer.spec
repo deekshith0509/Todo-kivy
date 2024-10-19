@@ -17,7 +17,7 @@ android.release_artifact = apk
 android.presplash_color = #FFFFFF
 debug = 1
 android.allow_backup = True
-android.manifest.exclude = extractNativeLibs
+
 android.logcat = True
 #android.add_activities = org.kivy.android.PythonActivity
 

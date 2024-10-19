@@ -48,7 +48,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install cython==0.29.20 buildozer==0.40.0
+          pip install cython==0.29.20 buildozer
       
       - name: Install additional build dependencies
         run: |

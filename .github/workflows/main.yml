@@ -51,7 +51,11 @@ jobs:
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
-          pip install cython==0.29.9
+
+      - name: Install Cython (specific version)
+        run: |
+          source venv/bin/activate
+          pip install Cython==0.29.9
 
       - name: Install Kivy and Buildozer
         run: |
@@ -61,6 +65,8 @@ jobs:
       - name: Install additional build dependencies
         run: |
           sudo apt-get install -y \
+            gcc-8 \
+            g++-8 \
             libssl-dev \
             libffi-dev \
             build-essential \
@@ -73,6 +79,8 @@ jobs:
             libavformat-dev \
             libavcodec-dev \
             zlib1g-dev
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 10
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 10
 
       - name: Update buildozer.spec
         run: |

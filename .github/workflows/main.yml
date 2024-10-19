@@ -34,6 +34,7 @@ jobs:
       - name: Accept Android licenses
         run: |
           yes | sdkmanager --licenses
+          yes | sdkmanager --update
       - name: Install required Android SDK packages
         run: |
           sdkmanager "platforms;android-30" "build-tools;30.0.3" "platform-tools"
@@ -56,9 +57,13 @@ jobs:
             libavformat-dev \
             libavcodec-dev \
             zlib1g-dev
+      - name: Update buildozer.spec
+        run: |
+          sed -i 's/^android.sdk_path =.*/android.sdk_path = \/usr\/local\/android-sdk/' buildozer.spec
+          sed -i 's/^android.accept_sdk_license =.*/android.accept_sdk_license = True/' buildozer.spec
       - name: Build APK
         run: |
-          buildozer -v android debug
+          buildozer android debug
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:

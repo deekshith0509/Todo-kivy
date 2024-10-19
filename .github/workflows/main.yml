@@ -59,13 +59,6 @@ jobs:
             libavformat-dev \
             libavcodec-dev \
             zlib1g-dev
-      - name: Update buildozer.spec
-        run: |
-          sed -i "s|^android.sdk_path =.*|android.sdk_path = $HOME/android-sdk|" buildozer.spec
-          sed -i 's/^android.accept_sdk_license =.*/android.accept_sdk_license = True/' buildozer.spec
-          sed -i 's/^android.build_tools =.*/android.build_tools = 30.0.3/' buildozer.spec
-          sed -i 's/^log_level =.*/log_level = 2/' buildozer.spec
-          buildozer android clean
       - name: Build APK
         run: |
           yes | buildozer android debug

@@ -40,27 +40,26 @@ jobs:
       - name: Install required Android SDK packages
         run: |
           yes | sdkmanager --install "platforms;android-33" "build-tools;33.0.0" "platform-tools" --sdk_root=${ANDROID_HOME}
+      - name: Install additional build dependencies
+        run: |
+          sudo apt-get install -y \
+            python3-dev \
+            python3-pip \
+            python3-setuptools \
+            git \
+            zip \
+            openjdk-17-jdk
       - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install cython buildozer
-          buildozer android clean
-      - name: Install additional build dependencies
+      - name: Initialize Buildozer
         run: |
-          sudo apt-get install -y \
-            libssl-dev \
-            libffi-dev \
-            build-essential \
-            libsdl2-dev \
-            libsdl2-image-dev \
-            libsdl2-mixer-dev \
-            libsdl2-ttf-dev \
-            libportmidi-dev \
-            libswscale-dev \
-            libavformat-dev \
-            libavcodec-dev \
-            zlib1g-dev
-      - name: Create build directory
+          buildozer init
+      - name: Clean Build
+        run: |
+          buildozer android clean
+      - name: Create build directories
         run: |
           mkdir -p .buildozer/android/platform/python-for-android
       - name: Update buildozer.spec

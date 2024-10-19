@@ -25,17 +25,18 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y wget unzip
+          mkdir -p $HOME/android-sdk
           wget https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip
           unzip commandlinetools-linux-7302050_latest.zip
-          sudo mkdir -p /usr/local/android-sdk/cmdline-tools
-          sudo mv cmdline-tools /usr/local/android-sdk/cmdline-tools/latest
-          echo "ANDROID_HOME=/usr/local/android-sdk" >> $GITHUB_ENV
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          mv cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
           echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH" >> $GITHUB_ENV
       - name: Accept Android licenses
         run: |
-          mkdir -p /usr/local/android-sdk/licenses
-          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > /usr/local/android-sdk/licenses/android-sdk-license
-          echo "84831b9409646a918e30573bab4c9c91346d8abd" > /usr/local/android-sdk/licenses/android-sdk-preview-license
+          mkdir -p $HOME/android-sdk/licenses
+          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > $HOME/android-sdk/licenses/android-sdk-license
+          echo "84831b9409646a918e30573bab4c9c91346d8abd" > $HOME/android-sdk/licenses/android-sdk-preview-license
       - name: Install required Android SDK packages
         run: |
           yes | sdkmanager --install "platforms;android-30" "build-tools;30.0.3" "platform-tools" --sdk_root=${ANDROID_HOME}
@@ -60,7 +61,7 @@ jobs:
             zlib1g-dev
       - name: Update buildozer.spec
         run: |
-          sed -i 's/^android.sdk_path =.*/android.sdk_path = \/usr\/local\/android-sdk/' buildozer.spec
+          sed -i "s|^android.sdk_path =.*|android.sdk_path = $HOME/android-sdk|" buildozer.spec
           sed -i 's/^android.accept_sdk_license =.*/android.accept_sdk_license = True/' buildozer.spec
           sed -i 's/^android.build_tools =.*/android.build_tools = 30.0.3/' buildozer.spec
       - name: Build APK

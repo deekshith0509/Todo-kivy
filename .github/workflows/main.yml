@@ -64,11 +64,18 @@ jobs:
           sed -i "s|^android.sdk_path =.*|android.sdk_path = $HOME/android-sdk|" buildozer.spec
           sed -i 's/^android.accept_sdk_license =.*/android.accept_sdk_license = True/' buildozer.spec
           sed -i 's/^android.build_tools =.*/android.build_tools = 30.0.3/' buildozer.spec
+          sed -i 's/^log_level =.*/log_level = 2/' buildozer.spec
       - name: Build APK
         run: |
-          yes | buildozer android debug
+          buildozer android debug
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
           name: todo_app_apk
           path: bin/*.apk
+      - name: Upload build logs
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: buildozer_logs
+          path: .buildozer/android/build/*.log

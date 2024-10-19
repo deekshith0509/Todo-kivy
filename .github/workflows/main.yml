@@ -12,15 +12,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
+
       - name: Install Android Command Line Tools
         run: |
           sudo apt-get update
@@ -32,18 +35,24 @@ jobs:
           mv cmdline-tools $HOME/android-sdk/cmdline-tools/latest
           echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
           echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH" >> $GITHUB_ENV
+
       - name: Accept Android licenses
         run: |
           mkdir -p $HOME/android-sdk/licenses
           echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > $HOME/android-sdk/licenses/android-sdk-license
           echo "84831b9409646a918e30573bab4c9c91346d8abd" > $HOME/android-sdk/licenses/android-sdk-preview-license
+
       - name: Install required Android SDK packages
         run: |
           yes | sdkmanager --install "platforms;android-30" "build-tools;30.0.3" "platform-tools" --sdk_root=${ANDROID_HOME}
-      - name: Install dependencies
+
+      - name: Set up Python virtual environment
         run: |
+          python -m venv venv
+          source venv/bin/activate
           pip install --upgrade pip
-          pip install cython==0.29.9 buildozer
+          pip install cython==0.29.9 kivy==1.10.0 buildozer
+
       - name: Install additional build dependencies
         run: |
           sudo apt-get install -y \
@@ -59,20 +68,25 @@ jobs:
             libavformat-dev \
             libavcodec-dev \
             zlib1g-dev
+
       - name: Update buildozer.spec
         run: |
           sed -i "s|^android.sdk_path =.*|android.sdk_path = $HOME/android-sdk|" buildozer.spec
           sed -i 's/^android.accept_sdk_license =.*/android.accept_sdk_license = True/' buildozer.spec
           sed -i 's/^android.build_tools =.*/android.build_tools = 30.0.3/' buildozer.spec
           sed -i 's/^log_level =.*/log_level = 2/' buildozer.spec
+
       - name: Build APK
         run: |
+          source venv/bin/activate
           yes | buildozer android debug
+
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
           name: todo_app_apk
           path: bin/*.apk
+
       - name: Upload build logs
         if: failure()
         uses: actions/upload-artifact@v3

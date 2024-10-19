@@ -48,7 +48,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install cython==0.29.20 buildozer
+          pip install cython==0.29.20 buildozer python-for-android
       
       - name: Install additional build dependencies
         run: |
@@ -79,7 +79,7 @@ jobs:
       
       - name: Build APK
         run: |
-          yes | buildozer android debug > build.log 2>&1
+          yes | buildozer android debug --verbose > build.log 2>&1
       
       - name: Upload APK
         uses: actions/upload-artifact@v3

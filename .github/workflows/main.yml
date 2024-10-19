@@ -67,7 +67,7 @@ jobs:
           sed -i 's/^log_level =.*/log_level = 2/' buildozer.spec
       - name: Build APK
         run: |
-          buildozer android debug
+          yes | buildozer android debug
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:

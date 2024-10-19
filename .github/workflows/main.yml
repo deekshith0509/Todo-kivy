@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3  # Updated to the latest version
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4  # Updated to the latest version
         with:
           python-version: '3.8'
 
@@ -33,7 +33,7 @@ jobs:
           buildozer -v android debug  # Build the APK in debug mode
 
       - name: Upload APK
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3  # Updated to the latest version
         with:
           name: todo_app_apk
           path: bin/*.apk  # Adjust this if your APK is located elsewhere

@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.8'  # Consider changing Python version
 
       - name: Set up Java
         uses: actions/setup-java@v3
@@ -30,9 +30,7 @@ jobs:
           sudo apt-get install -y wget unzip
           mkdir -p $HOME/android-sdk
           wget https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip
-          unzip commandlinetools-linux-7302050_latest.zip
-          mkdir -p $HOME/android-sdk/cmdline-tools
-          mv cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+          unzip commandlinetools-linux-7302050_latest.zip -d $HOME/android-sdk/cmdline-tools/latest
           echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
           echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH" >> $GITHUB_ENV
 
@@ -52,15 +50,15 @@ jobs:
           source venv/bin/activate
           pip install --upgrade pip
 
-      - name: Install Cython (specific version)
+      - name: Install Cython
         run: |
           source venv/bin/activate
-          pip install Cython==0.29.9
+          pip install Cython --upgrade  # Upgrade Cython to the latest version
 
       - name: Install Kivy and Buildozer
         run: |
           source venv/bin/activate
-          pip install kivy==1.10.0 buildozer
+          pip install --upgrade kivy buildozer
 
       - name: Install additional build dependencies
         run: |
@@ -82,6 +80,11 @@ jobs:
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 10
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 10
 
+      - name: Clean Buildozer
+        run: |
+          source venv/bin/activate
+          buildozer android clean  # Clean previous builds
+
       - name: Update buildozer.spec
         run: |
           sed -i "s|^android.sdk_path =.*|android.sdk_path = $HOME/android-sdk|" buildozer.spec
@@ -92,7 +95,7 @@ jobs:
       - name: Build APK
         run: |
           source venv/bin/activate
-          yes | buildozer android debug
+          yes | buildozer android debug -v  # Add verbose output for better debugging
 
       - name: Upload APK
         uses: actions/upload-artifact@v3

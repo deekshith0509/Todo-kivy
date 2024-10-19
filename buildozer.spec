@@ -26,9 +26,8 @@ android.logcat = True
 # android.ndk_path = /path/to/android-ndk-r25b
 
 # Specify NDK version if needed
-android.api = 33
+
 android.ndk = 25b
-android.sdk = 33
 
 # Increase log level for more details
 log_level = 2

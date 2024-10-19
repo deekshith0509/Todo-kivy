@@ -8,10 +8,10 @@ source.main = main.py
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,dm
 orientation = portrait
-requirements = python3,kivy==2.2.0,kivymd==1.2.0,markdown,materialyoucolor,exceptiongroup,asyncgui,asynckivy  # Required packages
+requirements = python3,kivy,kivymd,markdown,materialyoucolor,exceptiongroup,asyncgui,asynckivy  # Required packages
 
 fullscreen = 0
-version = 0.1
+version = 0.2
 android.permissions = INTERNET,WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE
 android.release_artifact = apk
 android.presplash_color = #FFFFFF
@@ -26,7 +26,9 @@ android.logcat = True
 # android.ndk_path = /path/to/android-ndk-r25b
 
 # Specify NDK version if needed
+android.api = 33
 android.ndk = 25b
+android.sdk = 33
 
 # Increase log level for more details
 log_level = 2

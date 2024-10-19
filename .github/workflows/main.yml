@@ -39,7 +39,7 @@ jobs:
           echo "84831b9409646a918e30573bab4c9c91346d8abd" > $HOME/android-sdk/licenses/android-sdk-preview-license
       - name: Install required Android SDK packages
         run: |
-          yes | sdkmanager --install "platforms;android-30" "build-tools;30.0.3" "platform-tools" --sdk_root=${ANDROID_HOME}
+          yes | sdkmanager --install "platforms;android-33" "build-tools;33.0.0" "platform-tools" --sdk_root=${ANDROID_HOME}
       - name: Install dependencies
         run: |
           pip install --upgrade pip
@@ -60,15 +60,17 @@ jobs:
             libavformat-dev \
             libavcodec-dev \
             zlib1g-dev
+      - name: Create build directory
+        run: |
+          mkdir -p .buildozer/android/platform/python-for-android
       - name: Update buildozer.spec
         run: |
           sed -i "s|^android.sdk_path =.*|android.sdk_path = $HOME/android-sdk|" buildozer.spec
           sed -i 's/^android.accept_sdk_license =.*/android.accept_sdk_license = True/' buildozer.spec
-          sed -i 's/^android.build_tools =.*/android.build_tools = 30.0.3/' buildozer.spec
+          sed -i 's/^android.build_tools =.*/android.build_tools = 33.0.0/' buildozer.spec
           sed -i 's/^log_level =.*/log_level = 2/' buildozer.spec
       - name: Build APK
         run: |
-          
           yes | buildozer android debug
       - name: Upload APK
         uses: actions/upload-artifact@v3

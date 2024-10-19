@@ -16,21 +16,37 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-
-      - name: Install dependencies
+      - name: Set up Java
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-pip
-          pip3 install --upgrade pip
-          pip3 install buildozer
+          sudo apt-get install -y openjdk-11-jdk
+
+      - name: Install Android SDK
+        run: |
+          sudo apt-get install -y wget unzip
+          mkdir -p $HOME/android-sdk
+          cd $HOME/android-sdk
+          wget https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip
+          unzip commandlinetools-linux-7302050_latest.zip
+          rm commandlinetools-linux-7302050_latest.zip
+          mkdir -p cmdline-tools/latest
+          mv cmdline-tools/* cmdline-tools/latest/
+          echo "export ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH" >> $GITHUB_ENV
+          source $GITHUB_ENV
 
       - name: Accept Android licenses
         run: |
           yes | sdkmanager --licenses
+
+      - name: Install required Android SDK packages
+        run: |
+          sdkmanager "platforms;android-30" "build-tools;30.0.3" "platform-tools"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install buildozer
 
       - name: Build APK
         run: |

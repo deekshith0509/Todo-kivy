@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3  # Updated to the latest version
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v4  # Updated to the latest version
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8'
 
@@ -28,12 +28,16 @@ jobs:
           pip3 install --upgrade pip
           pip3 install buildozer
 
+      - name: Accept Android licenses
+        run: |
+          yes | sdkmanager --licenses
+
       - name: Build APK
         run: |
           buildozer -v android debug  # Build the APK in debug mode
 
       - name: Upload APK
-        uses: actions/upload-artifact@v3  # Updated to the latest version
+        uses: actions/upload-artifact@v3
         with:
           name: todo_app_apk
           path: bin/*.apk  # Adjust this if your APK is located elsewhere

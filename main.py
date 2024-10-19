@@ -1,107 +1,201 @@
-import os
-from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.listview import ListView, ListItemButton
-from kivy.uix.textinput import TextInput
-from kivy.uix.button import Button
-from kivy.uix.label import Label
-from kivy.uix.checkbox import CheckBox
-from kivy.uix.recycleview import RecycleView
-from kivy.uix.recycleview.views import RecycleDataViewBehavior
-from kivy.storage.jsonstore import JsonStore
-from kivy.utils import platform
+from kivy.lang import Builder
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.properties import ListProperty, StringProperty
+from kivymd.app import MDApp
+from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.button import MDRaisedButton
+from kivymd.uix.textfield import MDTextField
+from kivy.uix.scrollview import ScrollView
+import random
 
+class MainScreen(Screen):
+    quote = StringProperty("")
 
-class TaskRecycleView(RecycleView):
-    def __init__(self, **kwargs):
-        super(TaskRecycleView, self).__init__(**kwargs)
-        self.data = []
+    def on_enter(self):
+        self.quote = random.choice(QUOTES)
 
-    def update_view(self):
-        self.data = [{'text': task, 'is_completed': False} for task in self.parent.app.load_tasks()]
-        self.refresh_from_data()
+class TaskListScreen(Screen):
+    tasks = ListProperty([])
+    def on_pre_enter(self, *args):
+        self.ids.task_list.clear_widgets()
+        for task in self.tasks:
+            self.ids.task_list.add_widget(
+                MDBoxLayout(
+                    MDRaisedButton(
+                        text=task,
+                        size_hint_x=1,
+                        on_release=lambda x: print(f"Task: {x.text}")
+                    ),
+                    size_hint_y=None,
+                    height="48dp"
+                )
+            )
 
+class SettingsScreen(Screen):
+    pass
 
-class TaskItem(BoxLayout):
-    def __init__(self, task_text, **kwargs):
-        super(TaskItem, self).__init__(**kwargs)
-        self.orientation = 'horizontal'
-        self.checkbox = CheckBox()
-        self.label = Label(text=task_text, size_hint_x=0.8)
-        self.remove_button = Button(text='Remove', size_hint_x=0.2)
-        
-        self.checkbox.bind(active=self.on_checkbox_active)
-        self.remove_button.bind(on_press=self.on_remove)
-        
-        self.add_widget(self.checkbox)
-        self.add_widget(self.label)
-        self.add_widget(self.remove_button)
+class TaskManagerApp(MDApp):
+    tasks = ListProperty([])
 
-    def on_checkbox_active(self, checkbox, value):
-        self.label.color = (0.5, 0.5, 0.5, 1) if value else (1, 1, 1, 1)
-
-    def on_remove(self, instance):
-        self.parent.remove_task(self.label.text)
-
-
-class ToDoApp(App):
     def build(self):
-        self.tasks_store = JsonStore(self.get_storage_path())
-        self.layout = BoxLayout(orientation='vertical')
-        self.task_input = TextInput(hint_text='Enter a task', size_hint_y=None, height=40)
-        self.add_button = Button(text='Add Task', size_hint_y=None, height=40)
-        
-        self.task_list = TaskRecycleView()
-        self.task_list.update_view()
+        self.theme_cls.primary_palette = "Blue"
+        return Builder.load_string(KV)
 
-        self.add_button.bind(on_press=self.add_task)
+    def change_screen(self, screen_name):
+        self.root.current = screen_name
 
-        self.layout.add_widget(self.task_input)
-        self.layout.add_widget(self.add_button)
-        self.layout.add_widget(self.task_list)
-
-        return self.layout
-
-    def get_storage_path(self):
-        """Get the appropriate storage path based on the platform."""
-        if platform == 'android':
-            from android.permissions import request_permissions, Permission
-            request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_EXTERNAL_STORAGE])
-            return os.path.join(os.environ['HOME'], 'todo_tasks.json')
-        else:
-            return os.path.join(os.getcwd(), 'todo_tasks.json')
-
-    def load_tasks(self):
-        """Load tasks from storage."""
-        if self.tasks_store.exists('tasks'):
-            return self.tasks_store.get('tasks')['tasks']
-        return []
-
-    def save_tasks(self):
-        """Save tasks to storage."""
-        self.tasks_store.put('tasks', tasks=self.load_tasks())
-
-    def add_task(self, instance):
-        """Add a task to the list."""
-        task = self.task_input.text.strip()
+    def add_task(self, task):
         if task:
-            tasks = self.load_tasks()
-            tasks.append(task)
-            self.tasks_store.put('tasks', tasks=tasks)  # Save to storage
-            self.task_list.update_view()  # Refresh the task list
-            self.task_input.text = ''
+            self.tasks.append(task)
+            self.root.get_screen('list').tasks = self.tasks
+            self.root.get_screen('main').ids.task_input.text = ''
 
-    def remove_task(self, task_text):
-        """Remove a task from the list."""
-        tasks = self.load_tasks()
-        tasks.remove(task_text)
-        self.tasks_store.put('tasks', tasks=tasks)  # Save updated tasks
-        self.task_list.update_view()  # Refresh the task list
+QUOTES = [
+    "The two most powerful warriors are patience and time.",
+    "Time is a created thing. To say 'I don't have time' is to say 'I don't want to.'",
+    "The past is a place of reference, not a place of residence.",
+    "Yesterday is history, tomorrow is a mystery, today is a gift. That's why we call it 'The Present'.",
+    "Time is free, but it's priceless. You can't own it, but you can use it. You can't keep it, but you can spend it.",
+]
 
-    def on_stop(self):
-        """Called when the app is closed; save tasks."""
-        self.save_tasks()
+KV = '''
+ScreenManager:
+    MainScreen:
+    TaskListScreen:
+    SettingsScreen:
 
+<MainScreen>:
+    name: 'main'
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDBoxLayout:
+            size_hint_y: None
+            height: "56dp"
+            md_bg_color: app.theme_cls.primary_color
+            MDLabel:
+                text: "ToDo"
+                halign: "center"
+                valign: "center"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+        MDTextField:
+            id: task_input
+            hint_text: "Enter Task"
+            pos_hint: {'center_x': 0.5}
+            size_hint_x: 0.9
+            multiline: False
+            on_text_validate: app.add_task(self.text)
+        MDLabel:
+            text: root.quote
+            halign: 'center'
+            valign: 'center'
+            theme_text_color: "Secondary"
+            size_hint_y: 1
+        MDBoxLayout:
+            size_hint_y: None
+            height: "56dp"
+            md_bg_color: app.theme_cls.primary_color
+            MDIconButton:
+                icon: "plus"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+                on_release: app.add_task(root.ids.task_input.text)
+            MDIconButton:
+                icon: "format-list-bulleted"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+                on_release: app.change_screen('list')
+            MDIconButton:
+                icon: "cog"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+                on_release: app.change_screen('settings')
 
-if __name__ == '__main__':
-    ToDoApp().run()
+<TaskListScreen>:
+    name: 'list'
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDBoxLayout:
+            size_hint_y: None
+            height: "56dp"
+            md_bg_color: app.theme_cls.primary_color
+            MDIconButton:
+                icon: "arrow-left"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+                on_release: app.change_screen('main')
+            MDLabel:
+                text: "Tasks"
+                halign: "center"
+                valign: "center"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+        ScrollView:
+            MDBoxLayout:
+                id: task_list
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+        MDBoxLayout:
+            size_hint_y: None
+            height: "56dp"
+            md_bg_color: app.theme_cls.primary_color
+            MDIconButton:
+                icon: "plus"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+                on_release: app.change_screen('main')
+            MDIconButton:
+                icon: "format-list-bulleted"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+            MDIconButton:
+                icon: "cog"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+                on_release: app.change_screen('settings')
+
+<SettingsScreen>:
+    name: 'settings'
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDBoxLayout:
+            size_hint_y: None
+            height: "56dp"
+            md_bg_color: app.theme_cls.primary_color
+            MDIconButton:
+                icon: "arrow-left"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+                on_release: app.change_screen('main')
+            MDLabel:
+                text: "Settings"
+                halign: "center"
+                valign: "center"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+        MDLabel:
+            text: "Settings go here"
+            halign: 'center'
+        MDBoxLayout:
+            size_hint_y: None
+            height: "56dp"
+            md_bg_color: app.theme_cls.primary_color
+            MDIconButton:
+                icon: "plus"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+                on_release: app.change_screen('main')
+            MDIconButton:
+                icon: "format-list-bulleted"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+                on_release: app.change_screen('list')
+            MDIconButton:
+                icon: "cog"
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+'''
+
+if __name__ == "__main__":
+    TaskManagerApp().run()

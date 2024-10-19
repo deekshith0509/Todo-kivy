@@ -3,38 +3,30 @@
 title = ToDo App
 package.name = todoapp
 package.domain = org.deekshith
+android.archs = arm64-v8a
+source.main = main.py
 source.dir = .
-source.include_exts = py,png,jpg,kv,dm
+source.include_exts = py,png,jpg,kv,atlas,dm
+orientation = portrait
+requirements = python3,kivy==2.2.0,kivymd==1.2.0,markdown,materialyoucolor,exceptiongroup,asyncgui,asynckivy  # Required packages
+
+fullscreen = 0
 version = 0.1
+android.permissions = INTERNET,WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE
+android.release_artifact = apk
+android.presplash_color = #FFFFFF
+debug = 1
+android.allow_backup = True
+android.manifest.exclude = extractNativeLibs
+android.logcat = True
+#android.add_activities = org.kivy.android.PythonActivity
 
-# Application requirements
-requirements = python3,kivy==2.2.0,kivymd==1.2.0,markdown,materialyoucolor,exceptiongroup,asyncgui,asynckivy  # Added all specified packages
+# Uncomment these lines if you need to specify paths
+# android.sdk_path = /path/to/android-sdk
+# android.ndk_path = /path/to/android-ndk-r25b
 
-# Permissions
-android.permissions = WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE, INTERNET  # Required permissions for storage and internet access
+# Specify NDK version if needed
+android.ndk = 25b
 
-# Orientation settings
-orientation = portrait  # Set to 'landscape' if needed
-
-# Application icon
-icon.filename = ./icon.png  # Path to your application icon (PNG format)
-
-# Log level
-log_level = 2  # 0: none, 1: error, 2: warning, 3: info, 4: debug
-
-# Packaging settings
-source.include_exts = py,png,jpg,kv,txt  # Add any other file types you might need
-source.exclude_exts = spec  # Exclude unnecessary files
-
-# Android specific settings
-android.archs = arm64-v8a  # Specify architectures for APK
-android.api = 33  # Set to the minimum SDK version you want to support
-android.minapi = 21  # Minimum API level required for your app
-android.target = 33  # Target API level (same as or greater than minapi)
-
-# Versioning
-version.code = 1  # Version code (used for updates)
-version.name = 0.1  # Version name displayed in the app
-
-# Build settings
-debug = 1  # Set to 1 to enable debugging
+# Increase log level for more details
+log_level = 2

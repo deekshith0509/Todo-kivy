@@ -51,7 +51,12 @@ jobs:
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
-          pip install cython==0.29.9 kivy==1.10.0 buildozer
+          pip install cython==0.29.9
+
+      - name: Install Kivy and Buildozer
+        run: |
+          source venv/bin/activate
+          pip install kivy==1.10.0 buildozer
 
       - name: Install additional build dependencies
         run: |

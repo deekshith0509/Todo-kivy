@@ -21,19 +21,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y openjdk-11-jdk
 
-      - name: Install Android SDK
+      - name: Install Android Command Line Tools
         run: |
           sudo apt-get install -y wget unzip
-          mkdir -p $HOME/android-sdk
-          cd $HOME/android-sdk
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          cd $HOME/android-sdk/cmdline-tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip
           unzip commandlinetools-linux-7302050_latest.zip
           rm commandlinetools-linux-7302050_latest.zip
-          mkdir -p cmdline-tools/latest
-          mv cmdline-tools/* cmdline-tools/latest/
+          mv cmdline-tools/* cmdline-tools/latest/  # Correctly move files
           echo "export ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
           echo "export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH" >> $GITHUB_ENV
-          source $GITHUB_ENV
 
       - name: Accept Android licenses
         run: |

@@ -11,9 +11,6 @@ import random
 
 # For Android functionality
 from kivy.utils import platform
-if platform == "android":
-    from android.permissions import request_permissions, Permission
-    from android.storage import primary_external_storage_path
 
 class SplashScreen(Screen):
     def on_enter(self):
@@ -40,6 +37,8 @@ class TaskListScreen(Screen):
         for task in self.tasks:
             self.add_task_widget(task)
 
+
+
     def add_task_widget(self, task):
         app = MDApp.get_running_app()
         task_item = OneLineIconListItem(
@@ -48,33 +47,47 @@ class TaskListScreen(Screen):
             text_color=(1, 1, 1, 1) if task['completed'] else (0, 0, 0, 1),
             bg_color=(0, 1, 0, 1) if task['completed'] else (0.9, 0.9, 0.9, 1)  # Green for completed tasks
         )
-
+    
         menu_items = [
-            {"viewclass": "OneLineListItem",
-             "text": "Mark Completed" if not task['completed'] else "Mark Incomplete",
-             "on_release": lambda x=task['task']: self.toggle_task_status(x)},
-            {"viewclass": "OneLineListItem",
-             "text": "Delete",
-             "on_release": lambda x=task['task']: self.delete_task(x)}
+            {
+                "viewclass": "OneLineListItem",
+                "text": "Mark Completed" if not task['completed'] else "Mark Incomplete",
+                "on_release": lambda x=task['task']: self.mark_complete_and_close(menu, x)
+            },
+            {
+                "viewclass": "OneLineListItem",
+                "text": "Delete",
+                "on_release": lambda x=task['task']: self.delete_and_close(menu, x)
+            }
         ]
+    
         menu = MDDropdownMenu(items=menu_items, width_mult=4)
-
+    
         def open_menu(instance):
             menu.caller = instance
             menu.open()
-
+    
         task_item.bind(on_release=open_menu)
         self.ids.task_list.add_widget(task_item)
-
+    
+    def mark_complete_and_close(self, menu, task):
+        self.toggle_task_status(task)  # Toggle task status
+        menu.dismiss()  # Close the dropdown menu
+    
+    def delete_and_close(self, menu, task):
+        self.delete_task(task)  # Delete the task
+        menu.dismiss()  # Close the dropdown menu
+    
     def toggle_task_status(self, task):
         app = MDApp.get_running_app()
         app.toggle_task_status(task)
         self.refresh_task_list()
-
+    
     def delete_task(self, task):
         app = MDApp.get_running_app()
         app.delete_task(task)
         self.refresh_task_list()
+
 
 class SettingsScreen(Screen):
     pass
@@ -131,23 +144,17 @@ class TaskManagerApp(MDApp):
 
     def load_tasks(self):
         try:
-            if platform == "android":
-                file_path = os.path.join(primary_external_storage_path(), 'tasks.json')
-            else:
-                file_path = 'tasks.json'
+            file_path = os.path.join(self.user_data_dir, 'tasks.json')
             if os.path.exists(file_path):
                 with open(file_path, 'r') as f:
                     self.tasks = json.load(f)
-                self.root.get_screen('list').tasks = self.tasks
+                # Assume you have a way to update the UI here
         except Exception as e:
             print(f"Error loading tasks: {e}")
 
     def save_tasks(self):
         try:
-            if platform == "android":
-                file_path = os.path.join(primary_external_storage_path(), 'tasks.json')
-            else:
-                file_path = 'tasks.json'
+            file_path = os.path.join(self.user_data_dir, 'tasks.json')
             with open(file_path, 'w') as f:
                 json.dump(self.tasks, f)
         except Exception as e:

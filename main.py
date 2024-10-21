@@ -129,6 +129,33 @@ class TaskManagerApp(MDApp):
             self.root.get_screen('main').ids.task_input.text = ''
             self.save_tasks()
 
+    def load_tasks(self):
+        try:
+            file_path = os.path.join(self.user_data_dir, 'tasks.json')
+            if os.path.exists(file_path):
+                with open(file_path, 'r') as f:
+                    self.tasks = json.load(f)
+                print(f"Tasks loaded: {self.tasks}")  # Debug statement
+                # Update the UI here
+                self.update_task_list_ui()
+            else:
+                print("No tasks.json file found.")
+        except Exception as e:
+            print(f"Error loading tasks: {e}")
+
+    def save_tasks(self):
+        try:
+            file_path = os.path.join(self.user_data_dir, 'tasks.json')
+            with open(file_path, 'w') as f:
+                json.dump(self.tasks, f)
+            print(f"Tasks saved: {self.tasks}")  # Debug statement
+        except Exception as e:
+            print(f"Error saving tasks: {e}")
+
+    def update_task_list_ui(self):
+        # Assuming you have a method to update the task list UI
+        self.root.get_screen('list').tasks = self.tasks
+
     def toggle_task_status(self, task_name):
         for task in self.tasks:
             if task['task'] == task_name:
@@ -142,23 +169,6 @@ class TaskManagerApp(MDApp):
         self.save_tasks()
         self.root.get_screen('list').tasks = self.tasks
 
-    def load_tasks(self):
-        try:
-            file_path = os.path.join(self.user_data_dir, 'tasks.json')
-            if os.path.exists(file_path):
-                with open(file_path, 'r') as f:
-                    self.tasks = json.load(f)
-                # Assume you have a way to update the UI here
-        except Exception as e:
-            print(f"Error loading tasks: {e}")
-
-    def save_tasks(self):
-        try:
-            file_path = os.path.join(self.user_data_dir, 'tasks.json')
-            with open(file_path, 'w') as f:
-                json.dump(self.tasks, f)
-        except Exception as e:
-            print(f"Error saving tasks: {e}")
 
 QUOTES = [
     "The two most powerful warriors are patience and time.",
@@ -213,7 +223,6 @@ ScreenManager:
             id: bottom_nav  # Added ID to the bottom navigation
             panel_color: app.theme_cls.primary_color
             selected_color_background: app.theme_cls.accent_color
-            text_color_active: app.theme_cls.accent_color
             MDBottomNavigationItem:
                 name: 'add'
                 text: 'Add'
@@ -244,7 +253,6 @@ ScreenManager:
             id: bottom_nav  # Added ID to the bottom navigation
             panel_color: app.theme_cls.primary_color
             selected_color_background: app.theme_cls.accent_color
-            text_color_active: app.theme_cls.accent_color
             MDBottomNavigationItem:
                 name: 'add'
                 text: 'Add'
@@ -273,7 +281,6 @@ ScreenManager:
             id: bottom_nav  # Added ID to the bottom navigation
             panel_color: app.theme_cls.primary_color
             selected_color_background: app.theme_cls.accent_color
-            text_color_active: app.theme_cls.accent_color
             MDBottomNavigationItem:
                 name: 'add'
                 text: 'Add'

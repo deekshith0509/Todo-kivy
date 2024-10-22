@@ -30,7 +30,7 @@ Todo Kivy is a simple to-do application developed using the **Python Kivy** fram
 To get started with Todo Kivy, follow these steps:
 
 1. **Clone the Repository**:
-   ```
+```
 git clone https://github.com/deekshith0509/Todo-kivy.git
 cd Todo-kivy
 ```

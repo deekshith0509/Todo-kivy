@@ -61,7 +61,7 @@ jobs:
             zlib1g-dev
       - name: Build APK
         run: |
-          yes | buildozer android debug
+          yes | buildozer android release
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:

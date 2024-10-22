@@ -44,7 +44,7 @@ python main.py
 
 4. **Build for Android**: To create an Android package, run:
 ```
-    buildozer -v android debug
+buildozer -v android debug
 ```
 5. **Deploy to Device**: Use Buildozer to install the APK on an Android device for testing.
 
